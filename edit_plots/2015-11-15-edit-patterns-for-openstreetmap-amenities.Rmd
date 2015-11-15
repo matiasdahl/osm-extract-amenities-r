@@ -21,13 +21,13 @@ There are two plots for each amenity:
 
 ## Notes
 
-- In the edit intensity plots, the *y*-scale is linear and time is discretized by week. In the edits/month plots, the *y*-scale is logarithmic and time is discretized by month. In both plots, deleting and undeleting are counted as edits. Also, if the amenity tag of an element is changed, say, from `amenity=cafe` to `amenity=restaurant`, the element appears in the plots for both tags.
+- In the edit intensity plots, the *y*-scale is linear and time is discretized by week. In the edits/month plots, the *y*-scale is logarithmic and time is discretized by month. In both plots, deleting and undeleting are counted as edits. So, if an map element is added in 2009 and deleted in 2010, the element would only contribute the the activity for those years. Also, if the amenity tag of an element is changed, say, from `amenity=cafe` to `amenity=restaurant`, the element appears in the plots for both tags.
 
 - Many of the intensity plots show growth by large jumps and contain dark vertical lines. These should correspond to database imports/automatic edits by bots, see the [OSM wiki](http://wiki.openstreetmap.org/wiki/Import). The plots indicate that elements that have been imported from databases typically have a lower edit intensity when compared to normal entries. In the plots, this is seen as lighter horizontal bands at the location of the vertical jumps. See for example the plot for the amenity `school` (at rank 2). 
 
 - The first plot visualizes more than 3.6 million edits to the OpenStreetMap, and the last plot around 12000. These are different orders of magnitude, and therefore the plots are also drawn with slightly different plotting parameters. This is to improve readability and contrast. As a consequence, the absolute shades in different plots are not comparable. 
 
-- In the intensity plots, the region close to the creation date is often darken than average. This behavior can be seen in the first few plots (with the most map elements). This would suggest that an element is more frequently edited shortly after it has been created. However, in the intensity plots with fewer elements, this is not visible. This could be due to the way the plots are rendered (see previous note).
+- In the intensity plots, the region close to the creation date is often darker than average. This behavior can be seen in the first few plots (with the most map elements). This would suggest that an element is more frequently edited shortly after it has been created. However, in the intensity plots with fewer elements, this is not visible. This could be due to the way the plots are rendered (see previous note).
 
 - Some of the graphs show a clear seasonal variation. See e.g. the plots for `bench` (rank 5) and `biergarten` (rank 63).
 
