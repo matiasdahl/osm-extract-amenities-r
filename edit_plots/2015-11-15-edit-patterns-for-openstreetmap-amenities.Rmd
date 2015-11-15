@@ -11,7 +11,7 @@ assert <- function(b) return(stopifnot(b))
 knitr::opts_chunk$set(fig.path = '2015/edit-patterns-for-openstreetmap-amenities/')
 ```
 
-The [extract-amenities](https://github.com/matiasdahl/osm-amenities-export) script outputs all the map elements in an [OpenStreetMap](https://www.openstreetmap.org/) file that have an `amenity=..`-tag. Also, if an element has multiple versions, all versions are extracted starting from the first version with an `amenity=..`-tag. An example of how to load and work with this data in R can be found [here](https://matiasdahl.github.io/blog/2015/loading-openstreetmap-amenity-data-into-r/). The purpose of this analysis is to use the same amenity data (the full export from 10.8.2015) and plot the edit intensity patterns for the top-75 amenities. These roughly correspond to those amenities with more than 5000 unique map elements when counted over the entire history of the OSM.
+The [extract-amenities](https://github.com/matiasdahl/osm-amenities-export) script outputs all the map elements in an [OpenStreetMap](https://www.openstreetmap.org/) file that have an `amenity=..`-tag. Also, if an element has multiple versions, all versions are extracted starting from the first version with an `amenity=..`-tag. An example of how to load and work with this data in R can be found [here](https://matiasdahl.github.io/blog/2015/loading-openstreetmap-amenity-data-into-r/). The purpose of this analysis is to use the same amenity data (the full export from 10.8.2015) and plot the edit intensity patterns for the top-75 amenities. These roughly correspond to those amenities with more than 5000 unique map elements when counted over the entire history of the OSM, that is, when we also include map elements that are currently deleted.
 
 There are two plots for each amenity:
 
@@ -21,7 +21,7 @@ There are two plots for each amenity:
 
 ## Notes
 
-- In the edit intensity plots, the *y*-scale is linear and time is discretized by week. In the edits/month plots, the *y*-scale is logarithmic and time is discretized by month. In both plots, deleting and undeleting are counted as edits. So, if an map element was added in 2009 and deleted in 2010, the element would only contribute the activity for those years. Also, if the amenity tag of an element is changed, say, from `amenity=cafe` to `amenity=restaurant`, the element appears in the plots for both tags.
+- In the edit intensity plots, the *y*-scale is linear and time is discretized by week. In the edits/month plots, the *y*-scale is logarithmic and time is discretized by month. In both plots, deleting and undeleting are counted as edits. So, if an map element was added in 2009 and deleted in 2010, the element would only contribute to the activity for those years. Also, if the amenity tag of an element is changed, say, from `amenity=cafe` to `amenity=restaurant`, the element appears in the plots for both tags.
 
 - Many of the intensity plots show growth by large jumps and contain dark vertical lines. These should correspond to database imports/automatic edits by bots, see the [OSM wiki](http://wiki.openstreetmap.org/wiki/Import). The plots indicate that elements that have been imported from databases typically have a lower edit intensity when compared to normal entries. In the plots, this is seen as lighter horizontal bands at the location of the vertical jumps. See for example the plot for the amenity `school` (at rank 2). 
 
