@@ -1,0 +1,115 @@
+---
+title: "Edit patterns for OpenStreetMap amenities"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r global_options, echo=FALSE}
+assert <- function(b) return(stopifnot(b))
+
+knitr::opts_chunk$set(fig.path = '2015/edit-patterns-for-openstreetmap-amenities/')
+```
+
+The [extract-amenities](https://github.com/matiasdahl/osm-amenities-export) script outputs all the map elements in an [OpenStreetMap](https://www.openstreetmap.org/) file that have an `amenity=..`-tag. Also, if an element has multiple versions, all versions are extracted starting from the first version with an `amenity=..`-tag. An example of how to load and work with this data in R can be found [here](https://matiasdahl.github.io/blog/2015/loading-openstreetmap-amenity-data-into-r/). The purpose of this analysis is to use the same amenity data (the full export from 10.8.2015) and plot the edit intensity patterns for the top-75 amenities. These roughly correspond to those amenities with more than 5000 unique map elements when counted over the entire history of the OSM.
+
+There are two plots for each amenity:
+
+**Edit intensity:** In the first plot, the *x*-axis represents time, the *y*-axis represents all the map elements with a specific amenity tag, and edits are represented by points whose darkness increase with edit intensity. On the *y*-axis, the elements are ordered chronologically by the date a first `amenity=..` tag was added to a map element. Due to the large number of map elements, the data in these plots is highly compressed. For example, the first plot visualizes the ca. 2 million unique map elements that have ever had an `amenity=parking`-tag, and on-screen these are mapped onto ca. 500-1000 pixels. 
+
+**Edits/month:** For each amenity, the second plot shows the total number of edits per month. 
+
+## Notes
+
+- In the edit intensity plots, the *y*-scale is linear and time is discretized by week. In the edits/month plots, the *y*-scale is logarithmic and time is discretized by month. In both plots, deleting and undeleting are counted as edits. Also, if the amenity tag of an element is changed, say, from `amenity=cafe` to `amenity=restaurant`, the element appears in the plots for both tags.
+
+- Many of the intensity plots show growth by large jumps and contain dark vertical lines. These should correspond to database imports/automatic edits by bots, see the [OSM wiki](http://wiki.openstreetmap.org/wiki/Import). The plots indicate that elements that have been imported from databases typically have a lower edit intensity when compared to normal entries. In the plots, this is seen as lighter horizontal bands at the location of the vertical jumps. See for example the plot for the amenity `school` (at rank 2). 
+
+- The first plot visualizes more than 3.6 million edits to the OpenStreetMap, and the last plot around 12000. These are different orders of magnitude, and therefore the plots are also drawn with slightly different plotting parameters. This is to improve readability and contrast. As a consequence, the absolute shades in different plots are not comparable. 
+
+- In the intensity plots, the region close to the creation date is often darken than average. This behavior can be seen in the first few plots (with the most map elements). This would suggest that an element is more frequently edited shortly after it has been created. However, in the intensity plots with fewer elements, this is not visible. This could be due to the way the plots are rendered (see previous note).
+
+- Some of the graphs show a clear seasonal variation. See e.g. the plots for `bench` (rank 5) and `biergarten` (rank 63).
+
+## Plots
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+source('number_formatting.R')
+
+require('knitr')
+require('ggplot2')
+require('scales')
+require('lubridate')
+
+require('dplyr')
+
+#
+#  Load amenity data, and amend it with more detailed date information.
+#
+source('../loading/load_amenities.R')
+amenities <- load_amenities_cached('~/osm-data/amenities-output-history-150810/')
+
+amenities$date <- from_epoch(amenities$sec1970)
+amenities$week <- as.integer(format(x = amenities$date, format = "%W"))
+amenities$month <- as.integer(format(x = amenities$date, format = "%m"))
+amenities$year <- as.integer(format(x = amenities$date, format = "%Y"))
+
+#  Escape the '<unterschiedlich>'-tag
+amenities$amenity_type <- gsub(">", "", gsub("<", "", amenities$amenity_type))
+
+#
+#  `type` and `id` columns uniquely determine the map element. Make the 
+#  new column `unique_id` from these
+#
+amenities$unique_id <- paste0(substr(as.character(amenities$type), 1, 1),
+                              amenities$id)
+
+#
+#  Programatically create the R markdown content for the rest of the analysis. 
+#  The below first writes `plots.tmp.Rmd` and then includes the file.
+#
+#  For using the sink command in knitr, see: 
+#      https://groups.google.com/forum/#!topic/knitr/TCz9vNLlslY
+#
+#  For including R markdown files, see:
+#      http://stackoverflow.com/questions/17593912/insert-portions-of-a-markdown-document-inside-another-markdown-document-using-kn
+#
+
+source('./edit_plots.R')
+
+top_amenities <- amenity_frequency_table(amenities) 
+
+{
+    sink('plots.tmp.Rmd')
+
+    for (a_row in 1:75) {
+        amenity_count <- top_amenities[a_row, 'count'] 
+        amenity <- top_amenities[a_row, 'amenity_type'] 
+        
+        cat(paste0("#### Amenity: [", amenity, 
+                   "](https://wiki.openstreetmap.org/wiki/Tag:amenity%3D",
+                   amenity, ") (rank ", 
+                   a_row, ", unique elements = ", 
+                   human_number(amenity_count), ')\n\n'))
+        cat(paste0('```{r int_', amenity, 
+                   ', fig.width=11.0, fig.height = 8, echo = FALSE}\n'))
+        cat(paste0("a <- amenities_of_type(amenities, '", amenity, "')\n"))
+        cat("plot_all_edits(a)\n")
+        cat('```\n')
+        cat(paste0('```{r month_', amenity, 
+            ', fig.width=11.0, fig.height = 4.5, echo = FALSE}\n'))
+        cat("plot_by_month(a)\n")
+        cat("```\n \n")
+    }
+
+    sink()
+}
+```
+
+```{r child='plots.tmp.Rmd'}
+```
+
+## OSM License 
+
+The above analysis contains data from the OpenStreetMap project, (c) OpenStreetMap contributors. The OSM data is available under the [ODbL](https://www.openstreetmap.org/copyright). The R code for this analysis is available on [Github](https://github.com/matiasdahl/osm-extract-amenities-r/).
+
