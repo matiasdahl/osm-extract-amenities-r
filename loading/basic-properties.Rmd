@@ -1,0 +1,117 @@
+---
+title: "Loading OpenStreetMap amenity data into R"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r global_options, echo=FALSE} 
+# Note: File should be saved with UTF-8 encoding
+knitr::opts_chunk$set(fig.path = '2015-11-Loading-OpenStreetMap-amenity-data-into-R/')
+```
+
+[extract-amenities](https://github.com/matiasdahl/osm-amenities-export) is a script for extracting amenities from an OpenStreetMap data export. The script writes the amenity data into three tab-separated text files; one for nodes, one for ways, and one for relation map elements. Here we illustrate how to load these files into R, and how to make some simple analyses. The `extract-amenities` script can run on various OSM export files. Below, the output is shown for the [full planet export](http://planet.openstreetmap.org/planet/full-history/) from 10.8.2015 (67 GB as a .osm.bz2 format, MD5 checksum `d2a64c0f3c80daf73d5b4ea54ac47f6b`). This export includes version data and deleted entries, and for this input file, the exported amenities take around 1.2 GB. 
+
+The R code for this analysis is available on [Github](https://github.com/matiasdahl/osm-extract-amenities-r/).
+
+## Loading the amenity data
+
+Most of the R code for this analysis is contained in the two files loaded below. 
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+source('load_amenities.R') 
+source('helper.R') 
+```
+
+Then, after running `extract-amenities` on an OSM input file (see above), the extracted amenity data can be loaded into R as follows:
+
+```{r, message=FALSE}
+osmdir <- "~/osm-data/amenities-output-history-150810/"
+amenities <- load_amenities_cached(osmdir)
+```
+
+To speed up repeated loadings, the above command will only parse the files the first time and then cache the result for repeated calls. To force a reparse, one needs to delete the file `amenities.cache` in the directory passed to the function.
+
+## Column structure 
+
+The extracted amenities are now loaded into the `amenities` data frame and contains `r nrow(amenities)` rows and `r ncol(amenities)` columns. The first few rows read:
+
+```{r}
+kable(add_osm_links(head(amenities, 10)), format = 'markdown')
+```
+
+The `type` column can take values `node`, `way` and `relation`. The other columns are as in the output format of the `extract-amenities` script described [here](https://github.com/matiasdahl/osm-amenities-export). The position columns (`pos1` and `pos2`) are stored as strings to avoid changing the data). Since R only supports 32-bit integers natively (!), the `id`-column is stored as a string, see [this link](http://www.win-vector.com/blog/2015/06/r-in-a-64-bit-world/).
+
+Each row represents one version of a map element. Typically, one is most interested in the latest (and possibly the first) version of an element. The `flatten_entries` function extracts information from these versions:
+
+```{r}
+flat_amenities <- flatten_elements(amenities)
+```
+
+The column structure for this new data frame can be seen from the first few rows:
+
+```{r}
+kable(add_osm_links(head(flat_amenities, 10)), format = 'markdown')
+```
+
+Let us recall that a map element is extracted if it has an `amenity=..`-tag, or if a previous version of the element has an `amenity=..` tag. The `last_is_visible`-column indicates whether the last version is visible or if it is (currently) deleted. The `sec1970A` and `sec1970B`-columns store the values of the `sec1970`-column for the first and last versions. The other columns should be self-explanatory.
+
+The below table summarizes the loaded data:
+
+```{r}
+kable(amenity_summary(amenities), align = rep("r", 4), format = 'markdown')
+```
+
+The first and last timestamps are `r from_epoch(min(amenities$sec1970))` and `r from_epoch(max(amenities$sec1970))`. 
+
+## Examples
+
+Below are some examples illustrating how to work with the extracted amenity data in R.
+
+### Growth plots
+
+Let us first plot the growth of amenity elements. To do this, we select those map elements from `flat_amenities` whose latest version is tagged as an amenity and is not deleted. The below plot shows the growth of these entries as a function of the date they were (first) tagged as an amenity. [Since tags can be added, changed and removed, this is not necessarily the same as the element creation date.] 
+
+```{r OSM-growthplot, fig.height=8, fig.width=11.2}
+plot_growth(flat_amenities)
+```
+
+In terms of monthly growth we obtain the following (log-scale) graph showing the age profile:
+
+```{r OSM-ageprofile, fig.height = 4, fig.width=11.2}
+plot_age_profile(flat_amenities)
+```
+
+From the graphs one can see a number of vertical regions. Such jumps should be expected due to [database imports](http://wiki.openstreetmap.org/wiki/Import/Catalogue). The first plot is similar (with the jump in 2009) to the plot of total accumulated map elements on the [OSM wiki](http://wiki.openstreetmap.org/wiki/Stats). Note, however, that the above plots only include elements in the current OSM map (as of 8/2015). For example, the plots would not include amenities that were added in 2010 and deleted in 2012.
+
+### Longest unmodified map elements
+
+The below query (written using `dplyr`) finds those ten map elements that have not been modified for the longest time. This is computed from the same data as for the above growth graph (from `flat_amenities`).
+
+```{r}
+oldest_live <- flat_amenities %>% 
+                   filter(last_is_visible == TRUE, 
+                          last_amenity_type != "") %>% 
+                   arrange(sec1970B) %>%
+                   mutate(last_edit = from_epoch(sec1970B)) %>%
+                   select(-sec1970A, 
+                          -sec1970B, 
+                          -last_is_visible) %>%
+                   filter(row_number() <= 10)
+
+kable(add_osm_links(oldest_live), format = 'markdown')
+```
+
+All these entries have `last_version=1`. Therefore the `sec1970A` column is dropped, and the column `sec1970B` is reformatted and relabeled into the more readable `last_edit` column.
+
+### Top-50 amenity tags
+
+The counts of the most popular amenity tags are shown below. An interactive version of this table (that includes all amenities) is available on the OSM [taginfo website](http://taginfo.openstreetmap.org/keys/amenity). 
+
+```{r OSM-top50, fig.height=10, fig.width=10}
+plot_top_amenities(flat_amenities, 50)
+```
+
+## OSM License 
+
+The above analysis is based from the OpenStreetMap project, (c) OpenStreetMap contributors. The OSM data is available under the [ODbL](https://www.openstreetmap.org/copyright). The code for this analysis is available is available [here](https://github.com/matiasdahl/osm-extract-amenities-r/) (under the MIT license).
