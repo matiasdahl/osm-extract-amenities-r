@@ -21,7 +21,7 @@ There are two plots for each amenity:
 
 ## Notes
 
-- In the edit intensity plots, the *y*-scale is linear and time is discretized by week. In the edits/month plots, the *y*-scale is logarithmic and time is discretized by month. In both plots, deleting and undeleting are counted as edits. So, if an map element is added in 2009 and deleted in 2010, the element would only contribute the the activity for those years. Also, if the amenity tag of an element is changed, say, from `amenity=cafe` to `amenity=restaurant`, the element appears in the plots for both tags.
+- In the edit intensity plots, the *y*-scale is linear and time is discretized by week. In the edits/month plots, the *y*-scale is logarithmic and time is discretized by month. In both plots, deleting and undeleting are counted as edits. So, if an map element was added in 2009 and deleted in 2010, the element would only contribute the the activity for those years. Also, if the amenity tag of an element is changed, say, from `amenity=cafe` to `amenity=restaurant`, the element appears in the plots for both tags.
 
 - Many of the intensity plots show growth by large jumps and contain dark vertical lines. These should correspond to database imports/automatic edits by bots, see the [OSM wiki](http://wiki.openstreetmap.org/wiki/Import). The plots indicate that elements that have been imported from databases typically have a lower edit intensity when compared to normal entries. In the plots, this is seen as lighter horizontal bands at the location of the vertical jumps. See for example the plot for the amenity `school` (at rank 2). 
 
