@@ -16,9 +16,9 @@ assert(ca_number(123, digits=1) == 120)
 #
 #  Render percentages
 #
-render_ratio <- function(ratio) {
+render_ratio <- function(ratio, digits=1) {
     with_sign <- function(str) return(paste0(str, '%'))
-    return (with_sign(as.character(round(100.0 * ratio, 1))))
+    return (with_sign(as.character(round(100.0 * ratio, digits))))
 }
 assert(render_ratio(100/100) == "100%")
 assert(render_ratio(9.99/100) == "10%")
@@ -27,6 +27,10 @@ assert(render_ratio(1/100) == "1%")
 assert(render_ratio(0.1/100) == "0.1%")
 assert(render_ratio(0.15/100) == "0.2%")
 assert(render_ratio(0.009/100) == "0%")
+assert(render_ratio(0.213, digits=1) == "21.3%")
+assert(render_ratio(0.213, digits=0) == "21%")
+assert(render_ratio(0.210, digits=1) == "21%")
+assert(render_ratio(0.210, digits=0) == "21%")
 
 #
 #  Simplify number. Eg. `123478` -> `123k`
