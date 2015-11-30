@@ -1,0 +1,34 @@
+Finding related amenity tags on the OpenStreetMap
+
+Source files are UTF-8 encoded. The code is written using dplyr 0.4.2. It
+will probably not work with earlier versions. Images were compiled using
+GraphViz 2.38.0.
+
+Compiling the analysis requires some manual steps listed below:
+
+- Ensure that the images referenced with markdown-code from the .Rmd file
+  exist in the `./images/`-directory. These can be dummy images. They will
+  later be replaced.
+
+- Compile the R markdown file (for example, using R Studio). By default,
+  the extracted OSM data is read from the directory
+    `~/osm-data/amenities-output-history-150810/`.
+
+- Run `./scripts/compile_images`. This will use GraphViz to convert the
+  .gv files into png and svg files in the `./images/`-directory.
+
+- Crop/manipulate these png-image in-place to get the images shown in
+  the analysis. Then run `./scripts/move_images`. This will rename the cropped
+  images to end with `-crop.png`.
+
+- Rerun `./scripts/compile_images` to generate the full images.
+
+- (Recompile the R markdown file to include the excerpts. Only needed for
+  html output.)
+
+- Run `file ./images/*.png` to get the dimensions of the cropped images, and
+  edit the css header in `./scripts/post-header` to get the same scaling factor
+  for all image excerpts shown in the analysis.
+
+- Run `./scripts/make_post` to convert the markdown output .md-file and the images
+  into a Jekyll post. Edit the script to set the output directory.

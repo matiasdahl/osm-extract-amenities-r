@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# directory with homepage repo
+HOMEPAGEDIR=~/gitwork/matiasdahl.iki.fi
+
+cp scripts/post-header tmp.md
+tail -n +3 transitions.md >> tmp.md
+
+function style_file {
+    sed -i '.bak' "s/($1)/($1){: $2}/" tmp.md
+}
+
+# cropped images
+style_file '\.\/images\/osm-strong-crop\.png' '.img_strong_crop'
+style_file '\.\/images\/osm-top250-crop\.png' '.img_top250_crop'
+style_file '\.\/images\/osm-deleted-crop\.png' '.img_deleted_crop'
+
+# deleted image shown in full
+style_file '\.\/images\/osm-1-waste_basket\.png' '.img_waste_full'
+
+# ggplot images
+style_file '\.\/images\/distribution-1\.png' '.img_distribution'
+style_file '\.\/images\/transition_a-1\.png' '.img_t1'
+style_file '\.\/images\/transition_b-1\.png' '.img_t2'
+style_file '\.\/images\/transition_c-1\.png' '.img_t3'
+
+# replace all image paths with {{ page.asset-dir }}
+sed -i '.bak' 's/\.\/images\//{{ page.asset-dir }}/g' tmp.md
+
+# -p flag: do not report error if directory already exists
+mkdir -p $HOMEPAGEDIR/assets/2015/finding-related-amenity-tags-on-the-openstreetmap
+
+mv tmp.md $HOMEPAGEDIR/_posts/2015-12-01-finding-related-amenity-tags-on-the-openstreetmap.md
+
+function cp_img {
+  cp images/$1 $HOMEPAGEDIR/assets/2015/finding-related-amenity-tags-on-the-openstreetmap
+}
+
+# inline ggplots
+cp_img distribution-1.png
+cp_img transition_a-1.png
+cp_img transition_b-1.png
+cp_img transition_c-1.png
+
+# Graph 1
+cp_img osm-strong-crop.png
+cp_img osm-strong.png
+cp_img osm-strong.svg
+
+# Graph 2
+cp_img osm-top250-crop.png
+cp_img osm-top250.png
+cp_img osm-top250.svg
+
+# Graph 3
+cp_img osm-deleted-crop.png
+cp_img osm-deleted.png
+cp_img osm-deleted.svg
+
+# Graph 4
+cp_img osm-1-waste_basket.png

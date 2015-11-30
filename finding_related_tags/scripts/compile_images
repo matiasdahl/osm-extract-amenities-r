@@ -1,0 +1,11 @@
+#!/bin/bash
+
+function process {
+   dot -Tpng ./$1.gv > ./images/$1.png
+   dot -Tsvg ./$1.gv > ./images/$1.svg
+}
+
+process osm-strong
+process osm-top250
+process osm-deleted
+process osm-1-waste_basket

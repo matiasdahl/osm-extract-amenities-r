@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mv ./images/osm-strong.png ./images/osm-strong-crop.png
+mv ./images/osm-top250.png ./images/osm-top250-crop.png
+mv ./images/osm-deleted.png ./images/osm-deleted-crop.png
+
+# No need to crop the last image (osm-1-waste_basket.png).
+# It is included as-is.
