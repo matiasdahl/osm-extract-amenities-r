@@ -33,6 +33,18 @@ assert(render_ratio(0.210, digits=1) == "21%")
 assert(render_ratio(0.210, digits=0) == "21%")
 
 #
+#  percent0(x) = render_ratio(x, 0)
+#
+percent0 <- function(x) render_ratio(x, digits = 0)
+assert(percent0(0.001) == '0%')
+assert(percent0(0.01) == '1%')
+assert(percent0(0.015) == '2%')
+assert(percent0(0.1199) == '12%')
+assert(percent0(0.12) == '12%')
+assert(percent0(0.999) == '100%')
+assert(percent0(1.0) == '100%')
+
+#
 #  Simplify number. Eg. `123478` -> `123k`
 #
 human_number_unit <- function(n, user_digits, user_units) {
