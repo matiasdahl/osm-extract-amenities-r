@@ -1,9 +1,16 @@
 # osm-extract-amenities-r
 
+This repository contains the source files for the following analyses of the OpenStreetMap data:
+
+- [Finding related amenity tags on the OpenStreetMap](http://matiasdahl.iki.fi/2015/finding-related-amenity-tags-on-the-openstreetmap)
+- [Edit patterns for OpenStreetMap amenities](http://matiasdahl.iki.fi/2015/edit-patterns-for-openstreetmap-amenities)
+- [Loading OpenStreetMap amenity data into R](http://matiasdahl.iki.fi/2015/loading-openstreetmap-amenity-data-into-r) 
+
+----
 
 # License
 
-The .R and .Rmd files in this repository are released under the MIT license:
+The code (the R- and Rmd-files and the bash scripts) in this repository are released under the MIT license (see below). Note that these codes are meant to be run with the OpenStreetMap data as input. This data is (c) OpenStreetMap contributors, and available under the [ODbL](https://www.openstreetmap.org/copyright). See the compiled analyses linked above for further details. 
 
 ```
 Copyright (c) 2015, Matias Dahl
