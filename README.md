@@ -10,7 +10,7 @@ This repository contains the source files for the following analyses of the Open
 
 # License
 
-The code (the R- and Rmd-files and the bash scripts) in this repository are released under the MIT license (see below). Note that these codes are meant to be run with the OpenStreetMap data as input. This data is (c) OpenStreetMap contributors, and available under the [ODbL](https://www.openstreetmap.org/copyright). See the compiled analyses linked above for further details. 
+The source files (the R and Rmd files and the bash scripts) for the analyses in this repository are released under the MIT license (see below). Note that the analyses are meant to be run with the OpenStreetMap data as input. This data is (c) OpenStreetMap contributors, and available under the [ODbL](https://www.openstreetmap.org/copyright). See the compiled analyses linked above for further details. 
 
 ```
 Copyright (c) 2015, Matias Dahl
